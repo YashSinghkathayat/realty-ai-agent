@@ -1,34 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Realty AI Agent</title>
-</head>
-<body>
+<script>
+    document.querySelector("form").addEventListener("submit", async function(e) {
+        e.preventDefault();
 
-<h2>Property Search</h2>
+        const data = {
+            name: document.querySelector("input[placeholder='Full Name']").value,
+            location: document.querySelector("input[placeholder='e.g. Delhi, Mumbai']").value,
+            type: document.querySelector("select").value,
+            subtype: document.querySelector("input[placeholder='e.g. 2BHK, Shop, Plot']").value,
+            budget: document.querySelector("input[placeholder='e.g. 50L, 1Cr']").value,
+            sales_call: document.querySelectorAll("select")[1].value
+        };
 
-<form method="post">
-    Name: <input name="name"><br><br>
-    Location: <input name="location"><br><br>
+        const response = await fetch("/run-agent", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-    Property Type:
-    <select name="property_type">
-        <option>Residential</option>
-        <option>Commercial</option>
-    </select><br><br>
+        const result = await response.json();
 
-    Subtype: <input name="subtype"><br><br>
-
-    Budget: <input name="budget"><br><br>
-
-    Consent:
-    <select name="consent">
-        <option>yes</option>
-        <option>no</option>
-    </select><br><br>
-
-    <button type="submit">Submit</button>
-</form>
-
-</body>
-</html>
+        alert(
+            "Properties Found: " + result.property_count +
+            "\nStatus: " + result.status
+        );
+    });
+</script>

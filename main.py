@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from app.chat_agent import chat_agent
 from app.services.property_service import get_property_count
 from app.services.qualification_service import qualify_lead
@@ -6,10 +6,12 @@ from app.utils.json_handler import save_summary
 
 app = Flask(__name__)
 
+# ✅ Show UI
 @app.route("/")
 def home():
-    return "AI Agent Running 🚀"
+    return render_template("index.html")
 
+# ✅ API
 @app.route("/run-agent", methods=["POST"])
 def run_agent():
     lead = request.json
