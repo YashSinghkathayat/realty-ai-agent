@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realty AI Agent - Result</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+        }
+        .status-qualified { background-color: #2ecc71; }
+        .status-not-qualified { background-color: #e74c3c; }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Inquiry Results</h2>
+        <p>Thank you for your inquiry, <strong>{{ name }}</strong>!</p>
+        
+        <div class="result-box">
+            <div class="result-item">
+                <strong>Properties Found:</strong> {{ property_count }} matches
+            </div>
+            <div class="result-item">
+                <strong>Status:</strong> 
+                <span class="status-badge {% if status|lower == 'qualified' %}status-qualified{% else %}status-not-qualified{% endif %}">
+                    {{ status }}
+                </span>
+            </div>
+        </div>
+        
+        <a href="/" class="back-link">&larr; Submit Another Inquiry</a>
+    </div>
+</body>
+</html>
