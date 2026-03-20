@@ -1,29 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Realty AI Assistant</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f4f4f4;
+        }
+
+        .chat-container {
+            width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 10px;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .message {
+            margin: 10px 0;
+        }
+
+        .user {
+            text-align: right;
+            color: blue;
+        }
+
+        .bot {
+            text-align: left;
+            color: green;
+        }
+
+        .input-box {
+            display: flex;
+            margin-top: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+        }
+
+        button {
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h3>🤖 Realty AI Assistant</h3>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="input-box">
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
 <script>
-    document.querySelector("form").addEventListener("submit", async function(e) {
-        e.preventDefault();
+    function addMessage(message, sender) {
+        const chatBox = document.getElementById("chatBox");
+        const div = document.createElement("div");
+        div.className = "message " + sender;
+        div.innerText = message;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-        const data = {
-            name: document.querySelector("input[placeholder='Full Name']").value,
-            location: document.querySelector("input[placeholder='e.g. Delhi, Mumbai']").value,
-            type: document.querySelector("select").value,
-            subtype: document.querySelector("input[placeholder='e.g. 2BHK, Shop, Plot']").value,
-            budget: document.querySelector("input[placeholder='e.g. 50L, 1Cr']").value,
-            sales_call: document.querySelectorAll("select")[1].value
-        };
+    function sendMessage() {
+        const input = document.getElementById("userInput");
+        const message = input.value;
 
-        const response = await fetch("/run-agent", {
+        if (!message) return;
+
+        addMessage(message, "user");
+        input.value = "";
+
+        fetch("/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ message: message })
+        })
+        .then(res => res.json())
+        .then(data => {
+            addMessage(data.response, "bot");
+        })
+        .catch(err => {
+            addMessage("Error connecting to server", "bot");
         });
-
-        const result = await response.json();
-
-        alert(
-            "Properties Found: " + result.property_count +
-            "\nStatus: " + result.status
-        );
-    });
+    }
 </script>
+
+</body>
+</html>

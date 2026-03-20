@@ -1,64 +1,86 @@
-import datetime
+# app/chat_agent.py
 
-LOG_FILE = "logs/conversation.txt"
-
-
-def log_message(message):
-    """Save messages to log file with timestamp"""
-    with open(LOG_FILE, "a") as f:
-        f.write(f"{datetime.datetime.now()} - {message}\n")
+# Store user sessions (temporary memory)
+user_sessions = {}
 
 
-def get_input(prompt):
-    """Print question, take input, log both"""
-    print(prompt)
-    user_input = input("> ")
+def chat_agent(user_id, user_input):
+    """
+    Stateful chat agent for realty conversation
+    """
 
-    log_message(f"BOT: {prompt}")
-    log_message(f"USER: {user_input}")
+    # Initialize session if new user
+    if user_id not in user_sessions:
+        user_sessions[user_id] = {
+            "step": 0,
+            "data": {}
+        }
 
-    return user_input
+    session = user_sessions[user_id]
+    step = session["step"]
+    data = session["data"]
 
+    user_input = user_input.strip()
 
-def chat_agent(lead):
-    """Main conversation flow"""
+    # Step 0: Greeting + Name
+    if step == 0:
+        session["step"] = 1
+        return "Hello — this is RealtyAssistant. May I know your name?"
 
-    print("Hello — this is RealtyAssistant about your enquiry.")
-    log_message("Conversation Started")
-
-    # Step 1: Confirm Name
-    response = get_input(f"Am I speaking with {lead['name']}? (yes/no)")
-
-    if response.lower() != "yes":
-        name = get_input("May I know your name?")
-    else:
-        name = lead["name"]
+    # Step 1: Save Name
+    elif step == 1:
+        data["name"] = user_input
+        session["step"] = 2
+        return f"Nice to meet you {user_input}! Which location are you searching in?"
 
     # Step 2: Location
-    location = get_input("Which location are you searching in?")
+    elif step == 2:
+        data["location"] = user_input
+        session["step"] = 3
+        return "Are you looking for Residential or Commercial property?"
 
     # Step 3: Property Type
-    property_type = get_input("Residential or Commercial?")
+    elif step == 3:
+        data["type"] = user_input.lower()
+
+        if "residential" in user_input.lower():
+            session["step"] = 4
+            return "Which BHK are you looking for? (1/2/3/4)"
+        else:
+            session["step"] = 4
+            return "What type? (Shop / Office / Plot)"
 
     # Step 4: Subtype
-    if property_type.lower() == "residential":
-        subtype = get_input("Which BHK (1/2/3/4)?")
-    else:
-        subtype = get_input("Shops / Office / Plot?")
+    elif step == 4:
+        data["subtype"] = user_input
+        session["step"] = 5
+        return "What is your budget?"
 
     # Step 5: Budget
-    budget = get_input("What is your budget?")
+    elif step == 5:
+        data["budget"] = user_input
+        session["step"] = 6
+        return "Would you like a sales representative to call you? (yes/no)"
 
     # Step 6: Consent
-    consent = get_input("Would you like a sales representative to call? (yes/no)")
+    elif step == 6:
+        data["consent"] = user_input.lower()
+        session["step"] = 7
 
-    log_message("Conversation Ended")
+        # Final summary
+        return f"""
+✅ Thank you {data.get('name')}!
 
-    return {
-        "name": name,
-        "location": location,
-        "type": property_type,
-        "subtype": subtype,
-        "budget": budget,
-        "consent": consent
-    }
+Here are your details:
+📍 Location: {data.get('location')}
+🏠 Type: {data.get('type')}
+📌 Subtype: {data.get('subtype')}
+💰 Budget: {data.get('budget')}
+📞 Callback: {data.get('consent')}
+
+Our team will contact you soon!
+"""
+
+    # After completion
+    else:
+        return "Conversation completed. Start again by refreshing."
